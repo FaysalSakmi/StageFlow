@@ -2,9 +2,6 @@ import { Stagiaire, StagiaireAirtable } from "@/types"
 import { demoStagiaires } from "./demo-data"
 
 const USE_DEMO = process.env.NEXT_PUBLIC_USE_DEMO === "true"
-const API_KEY = process.env.AIRTABLE_API_KEY || ""
-const BASE_ID = process.env.AIRTABLE_BASE_ID || ""
-const TABLE_NAME = process.env.AIRTABLE_TABLE_NAME || ""
 
 function normalizeTypeStage(type: string): Stagiaire["typeStage"] {
   const t = type.replace(/\\u0027/g, "'").replace(/\\u00e9/g, "é").replace(/\\u00e0/g, "à")
@@ -33,36 +30,20 @@ export async function fetchStagiaires(): Promise<Stagiaire[]> {
     return demoStagiaires
   }
 
-  if (!API_KEY || !BASE_ID || !TABLE_NAME) {
-    console.warn("Airtable credentials missing, falling back to demo data")
-    await new Promise((r) => setTimeout(r, 600))
-    return demoStagiaires
-  }
-
   try {
-    const url = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}`
-    const allRecords: Stagiaire[] = []
-    let offset: string | undefined
+    const res = await fetch("/api/stagiaires", {
+      cache: "no-store",
+    })
 
-    do {
-      const params = new URLSearchParams()
-      if (offset) params.set("offset", offset)
+    if (!res.ok) {
+      const err = await res.json()
+      throw new Error(err.error || `HTTP ${res.status}`)
+    }
 
-      const res = await fetch(`${url}?${params.toString()}`, {
-        headers: { Authorization: `Bearer ${API_KEY}` },
-      })
-
-      if (!res.ok) throw new Error(`Airtable error: ${res.status}`)
-
-      const data = await res.json()
-      const records = (data.records || []).map(mapAirtableRecord)
-      allRecords.push(...records)
-      offset = data.offset
-    } while (offset)
-
-    return allRecords
+    const records: StagiaireAirtable[] = await res.json()
+    return records.map(mapAirtableRecord)
   } catch (err) {
-    console.error("Failed to fetch from Airtable:", err)
+    console.error("Failed to fetch stagiaires:", err)
     throw err
   }
 }

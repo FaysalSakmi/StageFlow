@@ -52,10 +52,13 @@ export function getTypeColor(type: StageType): string {
 }
 
 export function getTypeBadgeBg(type: StageType): string {
-  const map: Record<StageType, string> = {
+  const map: Record<string, string> = {
     "PFE": "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
     "PFA": "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
     "Stage d'application": "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200",
+    "Stage d'observation": "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
+    "Stage pré-embauche": "bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200",
+    "Autres": "bg-gray-100 text-gray-800",
   }
   return map[type] || "bg-gray-100 text-gray-800"
 }

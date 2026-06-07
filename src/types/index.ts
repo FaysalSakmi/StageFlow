@@ -1,4 +1,4 @@
-export type StageType = "PFE" | "PFA" | "Stage d'application"
+export type StageType = string
 
 export type StatutStage = "En cours" | "Terminé" | "À venir"
 

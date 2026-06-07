@@ -6,7 +6,7 @@ import moment from "moment"
 import "moment/locale/fr"
 import "react-big-calendar/lib/css/react-big-calendar.css"
 import { Stagiaire, StageType } from "@/types"
-import { parseDate, getStatut } from "@/lib/utils"
+import { parseDate, getStatut, getTypeColor } from "@/lib/utils"
 import { Skeleton } from "@/components/ui/Skeleton"
 
 moment.locale("fr")
@@ -21,11 +21,6 @@ interface CalendarEvent {
   type: StageType
 }
 
-const typeColors: Record<StageType, string> = {
-  "PFE": "#2563eb",
-  "PFA": "#16a34a",
-  "Stage d'application": "#d97706",
-}
 
 interface CalendarViewProps {
   stagiaires: Stagiaire[]
@@ -60,12 +55,17 @@ export default function CalendarView({ stagiaires }: CalendarViewProps) {
 
   const eventPropGetter = (event: CalendarEvent) => ({
     style: {
-      backgroundColor: typeColors[event.type] || "#6b7280",
+      backgroundColor: getTypeColor(event.type),
       borderRadius: "6px",
       border: "none",
       fontSize: "12px",
     },
   })
+
+const legendTypes = useMemo(
+  () => Array.from(new Set(stagiaires?.map((s) => s.typeStage))),
+  [stagiaires]
+)
 
   if (!mounted) {
     return <Skeleton className="h-[600px] w-full rounded-xl" />
@@ -73,18 +73,18 @@ export default function CalendarView({ stagiaires }: CalendarViewProps) {
 
   return (
     <div className="space-y-6">
-      {/* Legend */}
-      <div className="flex items-center gap-6">
-        {(["PFE", "PFA", "Stage d'application"] as StageType[]).map((type) => (
-          <div key={type} className="flex items-center gap-2">
-            <div
-              className="h-3 w-3 rounded-full"
-              style={{ backgroundColor: typeColors[type] }}
-            />
-            <span className="text-xs text-gray-600 dark:text-gray-400">{type}</span>
-          </div>
-        ))}
-      </div>
+{/* Legend */}
+       <div className="flex items-center gap-6">
+         {legendTypes.map((type) => (
+           <div key={type} className="flex items-center gap-2">
+             <div
+               className="h-3 w-3 rounded-full"
+               style={{ backgroundColor: getTypeColor(type) }}
+             />
+             <span className="text-xs text-gray-600 dark:text-gray-400">{type}</span>
+           </div>
+         ))}
+       </div>
 
       {/* Calendar */}
       <div className="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">

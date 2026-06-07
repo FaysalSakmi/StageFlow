@@ -5,9 +5,14 @@ const USE_DEMO = process.env.NEXT_PUBLIC_USE_DEMO === "true"
 
 function normalizeTypeStage(type: string): Stagiaire["typeStage"] {
   const t = type.replace(/\\u0027/g, "'").replace(/\\u00e9/g, "é").replace(/\\u00e0/g, "à")
+  if (!t) return "Autres"
+  const lower = t.toLowerCase()
   if (t.includes("PFA") || t.includes("Projet de Fin d'Année")) return "PFA"
   if (t.includes("PFE") || t.includes("Stage de fin d'études")) return "PFE"
-  return "Stage d'application"
+  if (lower.includes("observation")) return "Stage d'observation"
+  if (lower.includes("application")) return "Stage d'application"
+  if (lower.includes("pré-embauche") || lower.includes("pre-embauche")) return "Stage pré-embauche"
+  return t
 }
 
 function mapAirtableRecord(record: StagiaireAirtable): Stagiaire {

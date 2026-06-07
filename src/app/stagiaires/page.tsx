@@ -6,7 +6,6 @@ import { ChevronUp, ChevronDown, Download, Search, Eye, SlidersHorizontal } from
 import { useStagiaires } from "@/hooks/useStagiaires"
 import { Stagiaire, Filtres, StageType } from "@/types"
 import { filtrerStagiaires, trierStagiaires, formatDate, getStatut, exporterCSV } from "@/lib/utils"
-import { filieres, etablissements } from "@/lib/demo-data"
 import StageBadge from "@/components/ui/StageBadge"
 import StatutIndicator from "@/components/ui/StatutIndicator"
 import { TableSkeleton } from "@/components/ui/Skeleton"
@@ -81,22 +80,29 @@ export default function StagiairesPage() {
     </select>
   )
 
-  const stageTypeOptions: { value: string; label: string }[] = [
+const stageTypeOptions = useMemo(
+  () => [
     { value: "", label: "Tous les types" },
-    { value: "PFE", label: "PFE" },
-    { value: "PFA", label: "PFA" },
-    { value: "Stage d'application", label: "Stage d'application" },
-  ]
+    ...Array.from(new Set(stagiaires?.map((s) => s.typeStage))).map((t) => ({ value: t, label: t })),
+  ],
+  [stagiaires]
+)
 
-  const filiereOptions = [
+const filiereOptions = useMemo(
+  () => [
     { value: "", label: "Toutes les filières" },
-    ...filieres.map((f) => ({ value: f, label: f })),
-  ]
+    ...Array.from(new Set(stagiaires?.map((s) => s.filiere))).map((f) => ({ value: f, label: f })),
+  ],
+  [stagiaires]
+)
 
-  const etabOptions = [
+const etabOptions = useMemo(
+  () => [
     { value: "", label: "Tous les établissements" },
-    ...etablissements.map((e) => ({ value: e, label: e })),
-  ]
+    ...Array.from(new Set(stagiaires?.map((s) => s.etablissement))).map((e) => ({ value: e, label: e })),
+  ],
+  [stagiaires]
+)
 
   if (error) {
     return (
